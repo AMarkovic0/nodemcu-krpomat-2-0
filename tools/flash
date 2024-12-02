@@ -36,7 +36,11 @@ parse_args() {
               shift # past value
 	      ;;
           -m|--mode)
-              BIN="$(get_bin "${2}")"
+              if ! BIN="$(get_bin "${2}")"; then
+                  log "Failed to find firmware. Exiting program."
+		  exit 1
+	      fi
+
               shift # past argument
               shift # past value
               ;;
@@ -63,6 +67,11 @@ run_flash() {
 
     if [ -z "${PORT}" ]; then
         PORT="${DEFAULT_PORT}"
+    fi
+
+    if [ ! -e "${_port}" ]; then
+        log "${_port} doesn't exist"
+	return 1
     fi
 
     log "Flashing ${_bin} on port ${_port}"
