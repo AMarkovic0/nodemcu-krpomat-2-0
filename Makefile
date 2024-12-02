@@ -376,6 +376,9 @@ else
 	$(ESPTOOL) --port $(ESPPORT) --baud $(BAUDRATE) write_flash $(FLASHOPTIONS) 0x00000 $(FIRMWAREDIR)0x00000.bin 0x10000 $(FIRMWAREDIR)0x10000.bin
 endif
 
+flash_krpomat:
+	./tools/flash -p /dev/ttyUSB0 -m int
+
 .subdirs:
 	@set -e; $(foreach d, $(SUBDIRS), $(MAKE) -C $(d);)
 
