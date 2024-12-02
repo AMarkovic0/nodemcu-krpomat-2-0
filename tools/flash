@@ -1,0 +1,73 @@
+#!/bin/bash
+
+PROG_NAME="nodemcu_flash: "
+
+log() {
+    echo "${PROG_NAME}" "$@" 1>&2
+}
+
+get_bin() {
+    local _mode="${1}"
+
+    if [ "${_mode}" != "int" ] && [ "${_mode}" != "float" ]; then
+        log "Wrong mode. Mode can be \"float\" or \"integer\""
+        return 1
+    fi
+
+    local _bin
+    _bin="$(find ./bin | grep "${_mode}")"
+
+    if [ -z "${_bin}" ]; then
+        log "Could not find binary with mode ${_mode}"
+        return 1
+    fi
+
+    echo "${_bin}"
+}
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+          -p|--port)
+              PORT="${2}"
+              shift # past argument
+              shift # past value
+	      ;;
+          -m|--mode)
+              BIN="$(get_bin "${2}")"
+              shift # past argument
+              shift # past value
+              ;;
+          -*|--*)
+              echo "Unknown option $1"
+              exit 1
+              ;;
+          *)
+              POSITIONAL_ARGS+=("$1") # save positional arg
+              shift # past argument
+              ;;
+          esac
+    done
+}
+
+run_flash() {
+    local _port="${1}"
+    local _bin="${2}"
+
+    if ! command -v esptool.py 2>&1 >/dev/null; then
+        log "Cannot find esptool"
+	return 1
+    fi
+
+    log "Flashing ${_bin} on port ${_port}"
+    esptool.py --port "${_port}" --baud 115200 write_flash -fm qio 0x00000 "${_bin}"
+}
+
+log "Starting nodemcu flash..."
+
+parse_args "$@"
+run_flash "${PORT}" "${BIN}"
+
+log "Flashing done."
+
+exit 0
