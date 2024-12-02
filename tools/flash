@@ -6,6 +6,8 @@ log() {
     echo "${PROG_NAME}" "$@" 1>&2
 }
 
+DEFAULT_PORT="/dev/ttyUSB0"
+
 get_bin() {
     local _mode="${1}"
 
@@ -57,6 +59,10 @@ run_flash() {
     if ! command -v esptool.py 2>&1 >/dev/null; then
         log "Cannot find esptool"
 	return 1
+    fi
+
+    if [ -z "${PORT}" ]; then
+        PORT="${DEFAULT_PORT}"
     fi
 
     log "Flashing ${_bin} on port ${_port}"
