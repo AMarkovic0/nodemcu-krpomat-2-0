@@ -44,7 +44,7 @@ parse_args() {
               shift # past argument
               shift # past value
               ;;
-          -*|--*)
+          -*)
               echo "Unknown option $1"
               exit 1
               ;;
@@ -64,18 +64,18 @@ run_flash() {
     local _port="${1}"
     local _bin="${2}"
 
-    if ! command -v esptool.py 2>&1 >/dev/null; then
+    if ! command -v esptool.py >/dev/null; then
         log "Cannot find esptool"
 	return 1
     fi
 
     if [ -z "${PORT}" ]; then
-        PORT="${DEFAULT_PORT}"
+        _port="${DEFAULT_PORT}"
     fi
 
     if [ ! -e "${_port}" ]; then
-        log "${_port} doesn't exist"
-	return 1
+        log "Port ${_port} doesn't exist"
+	exit 1
     fi
 
     log "Flashing ${_bin} on port ${_port}"
