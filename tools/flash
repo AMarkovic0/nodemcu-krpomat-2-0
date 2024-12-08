@@ -54,6 +54,10 @@ parse_args() {
               ;;
           esac
     done
+
+    if [ -z "${BIN}" ]; then
+        log "Missing binary fine argumenr (-b|--bin <name_of_the_bin_file>)."
+    fi
 }
 
 run_flash() {
@@ -78,7 +82,7 @@ run_flash() {
     esptool.py --port "${_port}" --baud 115200 write_flash -fm qio 0x00000 "${_bin}"
 }
 
-log "Starting nodemcu flash..."
+log "Starting nodemcu flasher."
 
 parse_args "$@"
 run_flash "${PORT}" "${BIN}"
